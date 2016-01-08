@@ -15,7 +15,12 @@ Perceptron.prototype.addData = function(item){
             this.weight[i] = Math.random()-0.5;
         }
     }
-    this.trainSet.push(item);
+    if(item.dimension == this.dimension){
+        this.trainSet.push(item);
+        return true;
+    }else{
+        return false;
+    }
 }
 
 Perceptron.prototype.clearData = function () {
@@ -84,15 +89,4 @@ Item.prototype.check = function(){
         return false;
 }
 
-set = [[3, 3, 1], [4, 3, 1], [1, 1, -1]];
-myPerceptron = new Perceptron(0.6);
-for(i in set){
-    var item = new Item(set[i]);
-    if(item.check())
-        myPerceptron.addData(item);
-}
-myPerceptron.train();
 
-
-var c = document.getElementById("myCanvas");
-var ctx = c.getContext("2d");
