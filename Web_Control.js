@@ -6,9 +6,10 @@ function Location(x,y){
     this.y = y;
 }
 
-function DrawPerceptron(perceptron,context,item){
+function DrawPerceptron(perceptron,context,item,predict,iteration,sample){
+    context.clearRect(0,0,context.canvas.width,context.canvas.height);
     if(perceptron.dimension==0){
-        alert("ÇëÌí¼ÓÑµÁ·¼¯£¡");
+        alert("Please add train set!");
         return;
     }
     var width = context.canvas.width;
@@ -110,15 +111,37 @@ function DrawPerceptron(perceptron,context,item){
         var text = "Actual class is "+item.result;
         context.fillText(text,output_layer[0].x+size*text.length/8,output_layer[0].y+size/3);
         //draw predict class
+        if(perceptron.cal(item)<=0){
+            var text = ""+(-item.result);
+            if(predict!=null&&predict==true){
+                context.font="20px Verdana";
+                context.fillStyle = "#FF0000";
+                context.fillText("Misclassfied, Update the weight",output_layer[0].x+40,output_layer[0].y+30);
+            }
+        }
+        else{
+            var text = ""+item.result;
+            if(predict!=null&&predict==true){
+                context.font="20px Verdana";
+                context.fillStyle = "#00FF00";
+                context.fillText("Correctly classifed, No need to update weight",output_layer[0].x+40,output_layer[0].y+30);
+            }
+        }
+        var size = 20;
         context.font="20px Verdana";
         context.fillStyle = "#FFFFFF";
-        var size = 20;
-        if(perceptron.cal(item)<=0)
-            var text = ""+(-item.result);
-        else
-            var text = ""+item.result;
         context.fillText(text,output_layer[0].x-size*text.length/4,output_layer[0].y+size/3);
         context.fillStyle = "#000000";
+        //draw iteration and data num
+        if(iteration!=null&&sample!=null){
+            context.font="20px Verdana";
+            context.fillStyle = "#000079";
+            context.fillText("Iteration",20,20);
+            context.fillText("No."+(iteration+1),120,20)
+            context.fillText("Sample",20,45);
+            context.fillText("No."+(sample+1),120,45)
+            context.fillStyle = "#000000";
+        }
     }
     //draw text in x layer
     for(var i=0;i<perceptron.dimension;i++){
@@ -142,7 +165,21 @@ function DrawPerceptron(perceptron,context,item){
     var size = 20;
     var text = "b="+(new Number(perceptron.weight[perceptron.dimension])).toFixed(1);
     context.fillText(text,combine_layer[1].x-size*text.length/5,combine_layer[1].y+size/3);
-
+    //draw weight
+    for(var i=0;i<perceptron.dimension;i++){
+        context.font="20px Verdana";
+        var size = 20;
+        var text = ""+(new Number(perceptron.weight[i])).toFixed(2);
+        if(combine_layer[0].x>=x_layer[i].x){
+            context.fillText(text,(1*combine_layer[0].x+3*x_layer[i].x)/4-30,(1*combine_layer[0].y+3*(x_layer[i].y+radius1))/4);
+        }else{
+            context.fillText(text,(1*combine_layer[0].x+3*x_layer[i].x)/4,(1*combine_layer[0].y+3*(x_layer[i].y+radius1))/4);
+        }
+        //context.font="10px Verdana";
+        //var size = 10;
+        //var text = ""+i;
+        //context.fillText(text,(combine_layer[0].x+x_layer[i].x)/2-size*text.length*1.2,(combine_layer[0].y+x_layer[i].y)/2);
+    }
 }
 
 function addTrain(){
@@ -153,25 +190,108 @@ function addTrain(){
         var data = [];
         for(j in a){
             var value = parseInt(a[j]);
-            if(value!=NaN)
+            if(!isNaN(value))
                 data.push(value);
         }
-        console.log(a);
-        console.log(data);
+        if(data.length>1){
+            var item = new Item(data);
+            if(item.dimension>10){
+                alert("Maximun Dimension is 10!");
+            }else{
+                if(!(item.check()&&myPerceptron.addData(item)))
+                    console.log("The ",parseInt(i)+1,"th data is invalid.");
+            }
+        }
+    }
+    DrawPerceptron(myPerceptron,ctx);
+    console.log(myPerceptron);
+}
+
+function clearTarin(){
+    add_set.value = "";
+    myPerceptron.clearData();
+    DrawPerceptron(myPerceptron,ctx);
+}
+
+function reset(){
+    myPerceptron.clearData();
+    DrawPerceptron(myPerceptron,ctx);
+}
+
+function step(){
+    if(myPerceptron.trainSet.length == 0){
+        alert("Please add train set!");
+        return false;
+    }
+    if(myPerceptron.iteration_num<1000){
+        DrawPerceptron(myPerceptron,ctx,myPerceptron.trainSet[myPerceptron.data_num],true,myPerceptron.iteration_num,myPerceptron.data_num);
+        if(myPerceptron.cal(myPerceptron.trainSet[myPerceptron.data_num])<=0){
+            myPerceptron.error++;
+            myPerceptron.update(myPerceptron.trainSet[myPerceptron.data_num]);
+            var copy1 = myPerceptron.data_num;
+            var copy2 = myPerceptron.iteration_num;
+            setTimeout(function () {DrawPerceptron(myPerceptron,ctx,myPerceptron.trainSet[copy1],false,copy2,copy1);},1500);
+        }else{
+            var copy1 = myPerceptron.data_num;
+            var copy2 = myPerceptron.iteration_num;
+            setTimeout(function () {DrawPerceptron(myPerceptron,ctx,myPerceptron.trainSet[copy1],false,copy2,copy1);},1500);
+        }
+        myPerceptron.data_num++;
+        console.log(myPerceptron.data_num);
+        if(myPerceptron.data_num == myPerceptron.trainSet.length){
+            if(myPerceptron.error==0){
+                alert("The training is done!")
+                return true;
+            }
+            myPerceptron.data_num = 0;
+            myPerceptron.error = 0;
+            myPerceptron.iteration_num++;
+        }
+    }else{
+        alert("The data is non-linear separable");
+        return false;
     }
 }
-var add_set = document.getElementById("trainSet");
 
-set = [[3, 3, 3, 1], [4, 3, 2, 1], [1, 1, -1, -1]];
-myPerceptron = new Perceptron(0.6);
-for(i in set){
-    var item = new Item(set[i]);
-    if(item.check())
-        myPerceptron.addData(item);
+function iteration(){
+    var current_iteration = myPerceptron.iteration_num;
+    var iterator = setInterval(function () {
+        var result = step();
+        if(result == false){
+            clearInterval(iterator);
+        }
+        if(myPerceptron.iteration_num>current_iteration){
+            clearInterval(iterator);
+            alert("One iteration done.");
+        }
+    },2000);
 }
-myPerceptron.train();
 
+function train(){
+    var iterator = setInterval(function () {
+        var result = step();
+        if(result==true||result==false){
+            clearInterval(iterator);
+        }
+    },2000);
+}
+
+function train_result(){
+    myPerceptron.train();
+    DrawPerceptron(myPerceptron,ctx);
+}
+
+
+var add_set = document.getElementById("trainSet");
+myPerceptron = new Perceptron(0.6);
 var c = document.getElementById("myCanvas");
 var ctx = c.getContext("2d");
 
-DrawPerceptron(myPerceptron,ctx,myPerceptron.trainSet[0]);
+//set = [[3, 3, 3, 1], [4, 3, 3, 1], [1, 1, -1, -1]];
+//for(i in set){
+//    var item = new Item(set[i]);
+//    if(item.check())
+//        myPerceptron.addData(item);
+//}
+//myPerceptron.train();
+//DrawPerceptron(myPerceptron,ctx,myPerceptron.trainSet[0]);

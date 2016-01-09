@@ -20,18 +20,19 @@
 <body bgcolor="#e6e6fa">
     <canvas id="myCanvas" width="1000" height="360" style="border:1px solid #c3c3c3;background-color:#E0F8F7"></canvas>
     <div>
-        <a href="#" class="button big" style="width:80px;height:25px;font-size:18px;" id="step">Step</a>
-        <a href="#" class="button big" style="width:80px;height:25px;font-size:18px;" id="iteration">Iteration</a>
-        <a href="#" class="button big" style="width:80px;height:25px;font-size:18px;" id="train">Train</a>
-        <a href="#" class="button big" style="width:80px;height:25px;font-size:18px;" id="reset">Reset</a>
+        <a href="#" class="button big" style="width:90px;height:25px;font-size:18px;" id="step" onclick="step()">Step</a>
+        <a href="#" class="button big" style="width:90px;height:25px;font-size:18px;" id="iteration" onclick="iteration()">Iteration</a>
+        <a href="#" class="button big" style="width:90px;height:25px;font-size:18px;" id="train" onclick="train()">Train</a>
+        <a href="#" class="button big" style="width:90px;height:25px;font-size:18px;" id="reset" onclick="reset()">Reset</a>
+        <a href="#" class="button big" style="width:90px;height:25px;font-size:18px;" id="train_result" onclick="train_result()">Train Result</a>
     </div>
     <div>
 
-        <p>请输入训练文本(不同组数据用‘；’隔开，同组数据用空格隔开，数据类&#8712;{1,-1}放在该组数据最后)，例如：“1 2 3.3 2 4 -1；-2 2 3 2 4 1；”</p>
+        <p>请输入训练文本(不同组数据用‘;’英文分号隔开，同组数据用空格隔开，数据类&#8712;{1,-1}放在该组数据最后,单个样本最大维度为10)，例如：“3 3 3 1; 4 3 3 1; 1 1 -1 -1;-1 -1 1 -1”</p>
         <textarea rows="8" cols="80" style="background-color:#FFDEDE;" id="trainSet"></textarea>
         <div>
             <a href="#" class="button" id="addTrain" onclick="addTrain()">添加训练集</a>
-            <a href="#" class="button danger" id="clear">清空训练集</a>
+            <a href="#" class="button danger" id="clear" on onclick="clearTarin()">清空训练集</a>
         </div>
     </div>
     <script type="text/javascript" src="Perceptron.js"></script>

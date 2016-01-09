@@ -5,7 +5,10 @@ function Perceptron(learning_rate){
     this.learning_rate = learning_rate;     //learning rate should be the real number between 0 and 1
     this.dimension = 0;                     //dimension is the dimension of training data
     this.weight = new Array();              //the weight array is used to store the weight and activation threshold
-    this.trainSet = new Array();
+    this.trainSet = new Array();            //data set used to train perceptron
+    this.iteration_num = 0;                 //the iteration number
+    this.data_num = 0;                      //the number of data used to train in one iteration
+    this.error = 0;                         //the error number in one iteration
 }
 
 Perceptron.prototype.addData = function(item){
@@ -27,6 +30,9 @@ Perceptron.prototype.clearData = function () {
     this.trainSet= [];
     this.weight = [];
     this.dimension = 0;
+    this.iteration_num = 0;
+    this.data_num = 0;
+    this.error = 0;
 }
 
 Perceptron.prototype.update = function(item){
@@ -54,23 +60,23 @@ Perceptron.prototype.cal = function(item){
 
 Perceptron.prototype.train = function () {
     if(this.trainSet.length == 0){
-        console.log("No available traning data");
+        console.log("Please add train set!");
         return false;
     }
-    for(var i = 0;i<1000;i++){
-        var error = 0;          //the misclassfied number
-        for(item in this.trainSet){
-            if(this.cal(this.trainSet[item])<=0){
-                error++;
-                this.update(this.trainSet[item]);
+    for(this.iteration_num = 0; this.iteration_num < 1000; this.iteration_num++){
+        this.error = 0;          //the misclassfied number
+        for(this.data_num = 0; this.data_num < this.trainSet.length; this.data_num++){
+            if(this.cal(this.trainSet[this.data_num])<=0){
+                this.error++;
+                this.update(this.trainSet[this.data_num]);
             }
         }
-        if(error == 0){
+        if(this.error == 0){
             console.log("w:",this.weight.slice(0,this.dimension)," b:",this.weight[this.dimension]);
             return true;
         }
     }
-    console.log("the data is non-linear separable");
+    alert("The data is non-linear separable");
     return false;
 }
 
